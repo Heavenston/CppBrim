@@ -87,6 +87,6 @@ namespace brim {
         Token(TokenType _type, TokenData _data = TokenData{0.0});
     };
 
-    Vec<Token> scan(char *source);
+    Vec<Token> scan(const char *source);
 
 }

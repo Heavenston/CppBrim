@@ -12,7 +12,7 @@ Token::Token(TokenType _type, TokenData _data) {
     data = _data;
 }
 
-Vec<Token> brim::scan(char *source) {
+Vec<Token> brim::scan(const char *source) {
     Vec<Token> vec;
     vec.ensure_capacity(strlen(source)/4);
 
