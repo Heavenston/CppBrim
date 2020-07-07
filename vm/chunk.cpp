@@ -9,7 +9,7 @@ usize Chunk::push_byte(u8 opcode) {
     program.push(opcode);
     return program.get_length()-1;
 }
-usize Chunk::write_byte(u8 opcode, usize offset) {
+void Chunk::write_byte(u8 opcode, usize offset) {
     program[offset] = opcode;
 }
 u8 Chunk::get_byte(usize offset) {

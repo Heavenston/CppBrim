@@ -12,7 +12,7 @@ namespace brim {
 
     public:
         usize push_byte(u8 opcode);
-        usize write_byte(u8 opcode, usize offset);
+        void write_byte(u8 opcode, usize offset);
         u8 get_byte(usize offset);
 
         usize get_program_length();
