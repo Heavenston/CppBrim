@@ -10,6 +10,8 @@ int main() {
     string text("5+5");
     auto tokens = scan(text.c_str());
 
+    cout << "Length: " << tokens.get_length() << "\n";
+
     for (usize i = 0; i < tokens.get_length(); i++) {
         Token token = tokens[i];
         switch (token.type) {

@@ -2,6 +2,7 @@
 #include <regex>
 #include <cstring>
 #include <string>
+#include <cstdio>
 #include "common.h"
 #include "scanner.h"
 
@@ -16,12 +17,14 @@ Vec<Token> brim::scan(const char *source) {
     Vec<Token> vec;
     vec.ensure_capacity(strlen(source)/4);
 
-    for (u32 i = 0; i < strlen(source); i++) {
+    u32 i = 0;
+    while (i < strlen(source)) {
         auto c = &source[i];
         Token *token = nullptr;
 
         switch (*c) {
             case '=':
+                i++;
                 if (source[i+1] == '=') {
                     i++;
                     token = new Token(TokenType::IsEqual);
@@ -31,6 +34,7 @@ Vec<Token> brim::scan(const char *source) {
                 }
             break;
             case '+':
+                i++;
                 if (source[i+1] == '=') {
                     i++;
                     token = new Token(TokenType::PlusAssigment);
@@ -40,6 +44,7 @@ Vec<Token> brim::scan(const char *source) {
                 }
             break;
             case '-':
+                i++;
                 if (source[i+1] == '=') {
                     i++;
                     token = new Token(TokenType::DashAssigment);
@@ -49,6 +54,7 @@ Vec<Token> brim::scan(const char *source) {
                 }
             break;
             case '*':
+                i++;
                 if (source[i+1] == '=') {
                     i++;
                     token = new Token(TokenType::StarAssigment);
@@ -58,6 +64,7 @@ Vec<Token> brim::scan(const char *source) {
                 }
             break;
             case '/':
+                i++;
                 if (source[i+1] == '=') {
                     i++;
                     token = new Token(TokenType::SlashAssigment);
@@ -67,6 +74,7 @@ Vec<Token> brim::scan(const char *source) {
                 }
             break;
             case '%':
+                i++;
                 if (source[i+1] == '=') {
                     i++;
                     token = new Token(TokenType::Percent);
@@ -76,6 +84,7 @@ Vec<Token> brim::scan(const char *source) {
                 }
             break;
             case '!':
+                i++;
                 if (source[i+1] == '=') {
                     i++;
                     token = new Token(TokenType::NotEqual);
@@ -85,6 +94,7 @@ Vec<Token> brim::scan(const char *source) {
                 }
             break;
             case '>':
+                i++;
                 if (source[i+1] == '=') {
                     i++;
                     token = new Token(TokenType::GreaterOrEqualThan);
@@ -94,6 +104,7 @@ Vec<Token> brim::scan(const char *source) {
                 }
             break;
             case '<':
+                i++;
                 if (source[i+1] == '=') {
                     i++;
                     token = new Token(TokenType::LessOrEqualThan);
@@ -103,84 +114,95 @@ Vec<Token> brim::scan(const char *source) {
                 }
             break;
             case '&':
+                i++;
                 if (source[i+1] == '&') {
                     i++;
                     token = new Token(TokenType::BooleanAnd);
                 }
             break;
             case '|':
+                i++;
                 if (source[i+1] == '|') {
                     i++;
                     token = new Token(TokenType::BooleanOr);
                 }
             break;
             case ',':
+                i++;
                 token = new Token(TokenType::Comma);
             break;
             case ';':
+                i++;
                 token = new Token(TokenType::SemiColon);
             break;
             case ':':
+                i++;
                 token = new Token(TokenType::Colon);
             break;
             case '{':
+                i++;
                 token = new Token(TokenType::CurlyOpen);
             break;
             case '}':
+                i++;
                 token = new Token(TokenType::CurlyClose);
             break;
             case '[':
+                i++;
                 token = new Token(TokenType::SquareOpen);
             break;
             case ']':
+                i++;
                 token = new Token(TokenType::SquareClose);
             break;
             case '(':
+                i++;
                 token = new Token(TokenType::BracketOpen);
             break;
             case ')':
+                i++;
                 token = new Token(TokenType::BracketClose);
             break;
         }
 
         if (token == nullptr) {
-            if (strcmp((char*)c, "let")) {
+            if (strcmp((char*)c, "let") == 0) {
                 i += 3;
                 token = new Token(TokenType::Let);
             }
-            else if (strcmp((char*)c, "const")) {
+            else if (strcmp((char*)c, "const") == 0) {
                 i += 4;
                 token = new Token(TokenType::Const);
             }
-            else if (strcmp((char*)c, "return")) {
+            else if (strcmp((char*)c, "return") == 0) {
                 i += 6;
                 token = new Token(TokenType::Return);
             }
-            else if (strcmp((char*)c, "true")) {
+            else if (strcmp((char*)c, "true") == 0) {
                 i += 4;
                 token = new Token(TokenType::True);
             }
-            else if (strcmp((char*)c, "false")) {
+            else if (strcmp((char*)c, "false") == 0) {
                 i += 5;
                 token = new Token(TokenType::False);
             }
-            else if (strcmp((char*)c, "null")) {
+            else if (strcmp((char*)c, "null") == 0) {
                 i += 4;
                 token = new Token(TokenType::Null);
             }
-            else if (strcmp((char*)c, "if")) {
+            else if (strcmp((char*)c, "if") == 0) {
                 i += 2;
                 token = new Token(TokenType::If);
             }
-            else if (strcmp((char*)c, "else")) {
+            else if (strcmp((char*)c, "else") == 0) {
                 i += 4;
                 token = new Token(TokenType::Else);
             }
-            else if (strcmp((char*)c, "while")) {
+            else if (strcmp((char*)c, "while") == 0) {
                 i += 5;
                 token = new Token(TokenType::While);
             }
-            else if (strcmp((char*)c, "func")) {
+            else if (strcmp((char*)c, "func") == 0) {
                 i += 4;
                 token = new Token(TokenType::Function);
             }
