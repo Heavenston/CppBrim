@@ -1,6 +1,6 @@
 
 #include <cstring>
-#include "brim.h"
+#include "common.h"
 #include "chunk.h"
 
 using namespace brim;

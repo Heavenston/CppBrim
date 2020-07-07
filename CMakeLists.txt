@@ -3,4 +3,3 @@ project(Brim VERSION 0.1.0)
 
 add_subdirectory(vm)
 add_subdirectory(cli)
-target_include_directories(brim PUBLIC vm)

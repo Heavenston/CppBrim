@@ -5,11 +5,7 @@ using namespace brim;
 using namespace std;
 
 int main() {
-    Vec<u8> vec;
-
-    for (u8 i = 0; i <= 254; i++) {
-       vec.push(i);
-    }
+    Chunk* chunk = new Chunk();
 
     return 0;
 }

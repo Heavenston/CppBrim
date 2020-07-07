@@ -1,6 +1,6 @@
 #pragma once
 
-#include "brim.h"
+#include "common.h"
 
 namespace brim {
 
