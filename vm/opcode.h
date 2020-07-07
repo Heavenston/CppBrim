@@ -1,4 +1,5 @@
 #pragma once
+
 #include "brim.h"
 
 namespace brim {
