@@ -21,6 +21,7 @@ namespace brim {
 
             capacity = newCapacity;
             content = (T*) realloc(content, newCapacity * sizeof(T));
+            if (content == nullptr) exit(1);
         }
 
     public:
