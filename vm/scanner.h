@@ -9,7 +9,7 @@
 namespace brim {
 
     enum class TokenType: u8 {
-        Equal,
+        Equal = 0,
         Power,
         Star,
         Increment,
