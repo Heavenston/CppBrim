@@ -26,12 +26,20 @@ namespace brim {
 
     public:
 
-        usize getCapacity() {
-            return capacity;
+        T *get_pointer() {
+            return content;
         }
 
-        usize getLength() {
+        usize get_capacity() {
+            return capacity;
+        }
+        usize get_length() {
             return length;
+        }
+
+        void ensure_capacity(usize ncapacity) {
+            if (capacity >= ncapacity) return;
+            growCapacity(ncapacity);
         }
 
         void push(T value) {
@@ -48,10 +56,10 @@ namespace brim {
             return content[length];
         }
 
-        T last() {
+        T& last() {
             return content[length-1];
         }
-        T first() {
+        T& first() {
             return content[0];
         }
 
