@@ -63,6 +63,10 @@ namespace brim {
             return content[0];
         }
 
+        T& peek(usize distance) {
+            return content[length-distance-1];
+        }
+
         T& operator[](usize t) {
             return content[t];
         }
