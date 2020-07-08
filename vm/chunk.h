@@ -12,11 +12,31 @@ namespace brim {
 
     public:
         usize push_opcode(u8 opcode);
-        usize push_arg(usize value);
+        template<class T>
+        usize push_arg(T value) {
+            u8 *last = (u8*)(&program.last())+1;
+            program.ensure_capacity(program.get_length()+sizeof(T));
+            *last = value;
+            program.set_length(program.get_length()+sizeof(T));
+            return 0;
+        }
+
         void write_opcode(u8 opcode, usize offset);
-        void write_arg(usize value, usize offset);
+        template<class T>
+        void write_arg(T value, usize offset) {
+            u8 *pointer = (u8*)(&program.first())+offset;
+            program.ensure_capacity(offset+sizeof(T));
+            *pointer = value;
+            program.set_length(offset+sizeof(T));
+        }
+
         u8 get_opcode(usize offset) const;
-        usize get_arg(usize offset) const;
+        template<class T>
+        T get_arg(T offset) const {
+            u8 *pointer = (u8*)(&program.first())+offset;
+            T value = *((T*)(pointer));
+            return value;
+        }
 
         usize get_program_length() const;
 
