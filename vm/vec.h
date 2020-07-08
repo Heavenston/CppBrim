@@ -40,6 +40,10 @@ namespace brim {
             return length;
         }
 
+        void set_length(usize _length) {
+            length = _length;
+        }
+
         void ensure_capacity(usize ncapacity) {
             if (capacity >= ncapacity) return;
             growCapacity(ncapacity);
