@@ -45,6 +45,15 @@ void Chunk::debug() {
         else if (OpCode::Add == op) {
             printf(" | Add\n");
         }
+        else if (OpCode::Div == op) {
+            printf(" | Div\n");
+        }
+        else if (OpCode::Mul == op) {
+            printf(" | Mul\n");
+        }
+        else if (OpCode::Sub == op) {
+            printf(" | Sub\n");
+        }
         else {
             printf(" | %x\n", program[i]);
         }
