@@ -1,7 +1,9 @@
 #pragma once
 
+#include <string>
 #include "common.h"
 #include "vec.h"
+#include "opcode.h"
 
 namespace brim {
 
@@ -11,7 +13,7 @@ namespace brim {
         Vec<u8> values;
 
     public:
-        usize push_opcode(u8 opcode);
+        usize push_opcode(OpCode opcode);
         template<class T>
         usize push_arg(T value) {
             u8 *last = (u8*)(&program.last())+1;
@@ -30,7 +32,7 @@ namespace brim {
             program.set_length(offset+sizeof(T));
         }
 
-        u8 get_opcode(usize offset) const;
+        OpCode get_opcode(usize offset) const;
         template<class T>
         T get_arg(T offset) const {
             u8 *pointer = (u8*)(&program.first())+offset;
@@ -40,7 +42,7 @@ namespace brim {
 
         usize get_program_length() const;
 
-        usize write_string(char *string, usize length);
+        usize write_string(const char *string, usize length);
         const char *read_string(usize offset, usize length) const;
     };
 
