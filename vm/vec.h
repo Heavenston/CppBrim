@@ -29,11 +29,14 @@ namespace brim {
         T *get_pointer() {
             return content;
         }
+        const T *get_pointer() const {
+            return content;
+        }
 
-        usize get_capacity() {
+        usize get_capacity() const {
             return capacity;
         }
-        usize get_length() {
+        usize get_length() const {
             return length;
         }
 
@@ -59,15 +62,27 @@ namespace brim {
         T& last() {
             return content[length-1];
         }
+        const T& last() const {
+            return content[length-1];
+        }
         T& first() {
+            return content[0];
+        }
+        const T& first() const {
             return content[0];
         }
 
         T& peek(usize distance) {
             return content[length-distance-1];
         }
+        const T& peek(usize distance) const {
+            return content[length-distance-1];
+        }
 
         T& operator[](usize t) {
+            return content[t];
+        }
+        const T& operator[](usize t) const {
             return content[t];
         }
     };
