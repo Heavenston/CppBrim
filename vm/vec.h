@@ -11,8 +11,9 @@ namespace brim {
         usize capacity = 0;
 
         T* content = nullptr;
+    public:
 
-        void growCapacity(usize newCapacity) {
+        void set_capacity(usize newCapacity) {
             if (newCapacity == 0) {
                 free(content);
                 content = nullptr;
@@ -23,8 +24,6 @@ namespace brim {
             content = (T*) realloc(content, newCapacity * sizeof(T));
             if (content == nullptr) exit(1);
         }
-
-    public:
 
         T *get_pointer() {
             return content;
@@ -46,12 +45,12 @@ namespace brim {
 
         void ensure_capacity(usize ncapacity) {
             if (capacity >= ncapacity) return;
-            growCapacity(ncapacity);
+            set_capacity(ncapacity);
         }
 
         void push(T value) {
             if (capacity <= length) {
-                growCapacity(capacity+10);
+                set_capacity(capacity+10);
             }
 
             content[length] = value;
