@@ -15,7 +15,7 @@ struct State {
 };
 
 Chunk *compile(const Vec<Token> &tokens) {
-    State state{
+    State state {
         tokens: tokens,
         current: 0,
         chunk: new Chunk()
