@@ -32,3 +32,22 @@ usize Chunk::write_string(const char *string, usize length) {
 const char *Chunk::read_string(usize offset, usize length) const {
     return (char*)(values.get_pointer() + (offset * sizeof(u8)));
 }
+
+void Chunk::debug() {
+    printf("Program: \n");
+    for (usize i = 0; i < program.get_length(); i++) {
+        OpCode op = (OpCode)program[i];
+        if (OpCode::Number == op) {
+            const f64 *n = get_arg<f64>(i+1);
+            printf(" | Number(%lf)\n", *n);
+            i += sizeof(f64);
+        }
+        else if (OpCode::Add == op) {
+            printf(" | Add\n");
+        }
+        else {
+            printf(" | %x\n", program[i]);
+        }
+    }
+    printf("\n");
+}

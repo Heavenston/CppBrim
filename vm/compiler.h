@@ -7,6 +7,6 @@
 
 namespace brim {
 
-    Chunk compile(const Vec<Token> &tokens);
+    Chunk *compile(const Vec<Token> &tokens);
 
 }

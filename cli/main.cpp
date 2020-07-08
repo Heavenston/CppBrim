@@ -7,22 +7,9 @@ using namespace std;
 
 int main() {
     
-    string text("5+5");
-    auto tokens = scan(text.c_str());
-
-    cout << "Length: " << tokens.get_length() << "\n";
-
-    for (usize i = 0; i < tokens.get_length(); i++) {
-        Token token = tokens[i];
-        switch (token.type) {
-            case TokenType::Number:
-                cout << "Number: " << token.data.number << "\n";
-            break;
-            default:
-                cout << "Autre\n";
-            break;
-        }
-    }
+    auto tokens = scan("5+5");
+    Chunk *chunk = compile(tokens);
+    chunk->debug();
     
     return 0;
 }

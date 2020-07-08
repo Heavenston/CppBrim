@@ -48,7 +48,7 @@ enum class CompileResult: u8 {
 CompileResult compile_expression(State &state);
 CompileResult compile_value(State &state);
 
-Chunk *compile(const Vec<Token> &tokens) {
+Chunk *brim::compile(const Vec<Token> &tokens) {
     State state {
         error_message: nullptr,
         tokens: tokens,
