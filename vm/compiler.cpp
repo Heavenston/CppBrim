@@ -9,8 +9,11 @@ struct State {
 
     Chunk *chunk;
 
-    const Token &current_token()const {
+    const Token &current_token() const {
         return tokens[current];
+    }
+    const Token &next() {
+        return tokens[current++];
     }
 };
 
