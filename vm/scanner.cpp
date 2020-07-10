@@ -3,6 +3,7 @@
 #include <cstring>
 #include <string>
 #include <cstdio>
+#include <iostream>
 #include "common.h"
 #include "scanner.h"
 
@@ -19,13 +20,14 @@ Vec<Token> brim::scan(const char *source) {
 
     u32 i = 0;
     while (i < strlen(source)) {
+        u32 startI = i;
         auto c = &source[i];
         Token *token = nullptr;
 
         switch (*c) {
             case '=':
                 i++;
-                if (source[i+1] == '=') {
+                if (source[i] == '=') {
                     i++;
                     token = new Token(TokenType::IsEqual);
                 }
@@ -35,7 +37,7 @@ Vec<Token> brim::scan(const char *source) {
             break;
             case '+':
                 i++;
-                if (source[i+1] == '=') {
+                if (source[i] == '=') {
                     i++;
                     token = new Token(TokenType::PlusAssigment);
                 }
@@ -45,7 +47,7 @@ Vec<Token> brim::scan(const char *source) {
             break;
             case '-':
                 i++;
-                if (source[i+1] == '=') {
+                if (source[i] == '=') {
                     i++;
                     token = new Token(TokenType::DashAssigment);
                 }
@@ -55,11 +57,11 @@ Vec<Token> brim::scan(const char *source) {
             break;
             case '*':
                 i++;
-                if (source[i+1] == '=') {
+                if (source[i] == '=') {
                     i++;
                     token = new Token(TokenType::StarAssigment);
                 }
-                else if (source[i+1] == '*') {
+                else if (source[i] == '*') {
                     i++;
                     token = new Token(TokenType::Power);
                 }
@@ -69,7 +71,7 @@ Vec<Token> brim::scan(const char *source) {
             break;
             case '/':
                 i++;
-                if (source[i+1] == '=') {
+                if (source[i] == '=') {
                     i++;
                     token = new Token(TokenType::SlashAssigment);
                 }
@@ -79,7 +81,7 @@ Vec<Token> brim::scan(const char *source) {
             break;
             case '%':
                 i++;
-                if (source[i+1] == '=') {
+                if (source[i] == '=') {
                     i++;
                     token = new Token(TokenType::Percent);
                 }
@@ -89,7 +91,7 @@ Vec<Token> brim::scan(const char *source) {
             break;
             case '!':
                 i++;
-                if (source[i+1] == '=') {
+                if (source[i] == '=') {
                     i++;
                     token = new Token(TokenType::NotEqual);
                 }
@@ -99,7 +101,7 @@ Vec<Token> brim::scan(const char *source) {
             break;
             case '>':
                 i++;
-                if (source[i+1] == '=') {
+                if (source[i] == '=') {
                     i++;
                     token = new Token(TokenType::GreaterOrEqualThan);
                 }
@@ -109,7 +111,7 @@ Vec<Token> brim::scan(const char *source) {
             break;
             case '<':
                 i++;
-                if (source[i+1] == '=') {
+                if (source[i] == '=') {
                     i++;
                     token = new Token(TokenType::LessOrEqualThan);
                 }
@@ -119,14 +121,14 @@ Vec<Token> brim::scan(const char *source) {
             break;
             case '&':
                 i++;
-                if (source[i+1] == '&') {
+                if (source[i] == '&') {
                     i++;
                     token = new Token(TokenType::BooleanAnd);
                 }
             break;
             case '|':
                 i++;
-                if (source[i+1] == '|') {
+                if (source[i] == '|') {
                     i++;
                     token = new Token(TokenType::BooleanOr);
                 }
@@ -291,6 +293,10 @@ Vec<Token> brim::scan(const char *source) {
             vec.push(Token(TokenType::Error));
         }
         else {
+            char* t = (char*)malloc((i-startI)+1);
+            t[i-startI] = 0;
+            memcpy(t, c, i-startI);
+            printf("T(%d): %s\n", (u8)token->type, t);
             vec.push(*token);
         }
     }

@@ -58,7 +58,7 @@ Chunk *brim::compile(const Vec<Token> &tokens) {
 
     CompileResult rs = compile_expression(state);
     if (rs != CompileResult::Ok) {
-        throw state.error_message;
+        printf("ERROR: %s\n", state.error_message->c_str());
     }
 
     return state.chunk;

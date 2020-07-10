@@ -4,6 +4,7 @@
 #include "common.h"
 #include "chunk.h"
 #include "vec.h"
+#include "value.h"
 
 using namespace brim;
 
@@ -17,10 +18,9 @@ namespace brim {
     public:
         VM();
 
-        void interpret(char *program);
-        void interpret_file(char *path);
+        void interpret(const char *program);
+        void interpret_file(const char *path);
 
-        Chunk *compile(char *program);
         void run();
 
     };

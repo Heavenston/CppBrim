@@ -13,15 +13,15 @@ namespace brim {
     class Value {
     private:
         ValueType type;
-        union As {
+        union Payload {
             f64 number;
             bool boolean;
-        } as;
+        } payload;
 
     public:
-        static Value create_null();
-        static Value create_number(f64 as);
-        static Value create_null(bool as);
+        Value();
+        Value(f64 as);
+        Value(bool as);
         
         bool is_type(ValueType is);
 
