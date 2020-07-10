@@ -59,6 +59,10 @@ Vec<Token> brim::scan(const char *source) {
                     i++;
                     token = new Token(TokenType::StarAssigment);
                 }
+                else if (source[i+1] == '*') {
+                    i++;
+                    token = new Token(TokenType::Power);
+                }
                 else {
                     token = new Token(TokenType::Star);
                 }
