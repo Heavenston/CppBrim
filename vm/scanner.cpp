@@ -20,7 +20,6 @@ Vec<Token> brim::scan(const char *source) {
 
     u32 i = 0;
     while (i < strlen(source)) {
-        u32 startI = i;
         auto c = &source[i];
         Token *token = nullptr;
 
@@ -293,10 +292,6 @@ Vec<Token> brim::scan(const char *source) {
             vec.push(Token(TokenType::Error));
         }
         else {
-            char* t = (char*)malloc((i-startI)+1);
-            t[i-startI] = 0;
-            memcpy(t, c, i-startI);
-            printf("T(%d): %s\n", (u8)token->type, t);
             vec.push(*token);
         }
     }
