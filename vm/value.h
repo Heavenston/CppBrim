@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.h"
+#include "objects/object.h"
 
 namespace brim {
 
@@ -16,12 +17,14 @@ namespace brim {
         union Payload {
             f64 number;
             bool boolean;
+            Object *object;
         } payload;
 
     public:
         Value();
         Value(f64 as);
         Value(bool as);
+        Value(Object *obj);
         
         bool is_type(ValueType is);
 

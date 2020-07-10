@@ -15,6 +15,10 @@ Value::Value(bool v) {
     type = ValueType::Null;
     payload.boolean = v;
 }
+Value::Value(Object *obj) {
+    type = ValueType::Null;
+    payload.object = obj;
+}
 
 bool Value::is_type(ValueType is) {
     return type == is;
