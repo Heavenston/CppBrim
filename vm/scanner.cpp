@@ -259,6 +259,7 @@ Vec<Token> brim::scan(const char *source) {
                 auto match = results[1].str();
                 f64 n = std::stof(match);
                 TokenData data;
+                data.number = n;
                 token = new Token(TokenType::Number, data);
             }
         }
@@ -271,6 +272,7 @@ Vec<Token> brim::scan(const char *source) {
                 auto match = results[1].str();
                 f64 n = std::stoi(match, nullptr, 16);
                 TokenData data;
+                data.number = n;
                 token = new Token(TokenType::Number, data);
             }
         }
@@ -283,6 +285,7 @@ Vec<Token> brim::scan(const char *source) {
                 auto match = results[1].str();
                 f64 n = std::stoi(match, nullptr, 2);
                 TokenData data;
+                data.number = n;
                 token = new Token(TokenType::Number, data);
             }
         }
