@@ -38,8 +38,8 @@ void Chunk::debug() {
     for (usize i = 0; i < program.get_length(); i++) {
         OpCode op = (OpCode)program[i];
         if (OpCode::Number == op) {
-            const f64 *n = get_arg<f64>(i+1);
-            printf(" | Number(%lf)\n", *n);
+            f64 n = *get_arg<f64>(i+1);
+            printf(" | Number(%lf)\n", n);
             i += sizeof(f64);
         }
         else if (OpCode::Add == op) {
