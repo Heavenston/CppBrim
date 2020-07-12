@@ -79,7 +79,7 @@ void VM::run() {
             if (!a.is_type(ValueType::Number) || !b.is_type(ValueType::Number)) {
                 return;
             }
-            stack.push(Value(powf64(a.number_val(), b.number_val())));
+            stack.push(Value(powf(a.number_val(), b.number_val())));
         }
 
         ip++;

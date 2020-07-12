@@ -17,6 +17,9 @@ struct State {
 
     Chunk *chunk;
 
+    State(string *er_mess, const Vec<Token> &tkns, Chunk *chnk):
+     tokens(tkns), error_message(er_mess), chunk(chnk) {}
+
     const Token *current() const {
         if (current_offset >= tokens.get_length()) return nullptr;
         return &tokens[current_offset];
@@ -49,12 +52,7 @@ CompileResult compile_expression(State &state);
 CompileResult compile_value(State &state);
 
 Chunk *brim::compile(const Vec<Token> &tokens) {
-    State state {
-        error_message: nullptr,
-        tokens: tokens,
-        current_offset: 0,
-        chunk: new Chunk()
-    };
+    State state(nullptr, tokens, new Chunk());
 
     CompileResult rs = compile_expression(state);
     if (rs != CompileResult::Ok) {

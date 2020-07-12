@@ -8,8 +8,6 @@
 
 namespace brim {
 
-    class Object;
-
     class StringObj: public Object {
     private:
         ObjectType type = ObjectType::String;

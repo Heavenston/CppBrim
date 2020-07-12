@@ -1,13 +1,9 @@
 #pragma once
 
 #include "../common.h"
-#include "../value.h"
-#include "string.h"
 
 namespace brim {
     
-    class Value;
-
     enum class ObjectType: u8 {
         String,
         Array,
@@ -20,8 +16,8 @@ namespace brim {
         ObjectType type;
 
     public:
-        virtual Value toString() {
-            return Value(new StringObj("[Object]"));
+        const char *toString() {
+            return "[Object]";
         }
 
     };
