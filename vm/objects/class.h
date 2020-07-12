@@ -5,6 +5,7 @@
 
 #include "object.h"
 #include "../vec.h"
+#include "../value.h"
 
 namespace brim {
 
@@ -14,7 +15,6 @@ namespace brim {
         std::unordered_map<std::string, Value> methods;
 
     public:
-        Value toString();
         
     };
 

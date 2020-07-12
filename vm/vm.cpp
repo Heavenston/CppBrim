@@ -10,6 +10,7 @@
 #include "scanner.h"
 #include "compiler.h"
 #include "opcode.h"
+#include "objects/string.h"
 
 using namespace brim;
 using namespace std;
@@ -40,6 +41,12 @@ void VM::run() {
             Value v(*(chunk->get_arg<f64>(ip+1)));
             ip += sizeof(f64);
             stack.push(v);
+        }
+        else if (v == OpCode::String) {
+            usize string_offset = *(chunk->get_arg<f64>(ip+1));
+            const char* string = chunk->read_string(string_offset);
+            ip += sizeof(f64);
+            stack.push(Value(new StringObj(string)));
         }
         else if (v == OpCode::Add) {
             Value &b = stack.pop();

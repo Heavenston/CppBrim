@@ -2,6 +2,7 @@
 
 #include "object.h"
 #include "../vec.h"
+#include "../value.h"
 
 namespace brim {
 
@@ -13,7 +14,6 @@ namespace brim {
     public:
         ArrayObj(Vec<Value> v);
 
-        Value toString();
     };
 
 }

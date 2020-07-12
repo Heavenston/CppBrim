@@ -163,7 +163,7 @@ CompileResult compile_value(State &state) {
     else if (current->type == TokenType::String) {
         state.next();
         state.chunk->push_opcode(OpCode::String);
-        usize offset = state.chunk->write_string(current->data.text->c_str(), current->data.text->length());
+        usize offset = state.chunk->write_string(current->data.text->c_str());
         state.chunk->push_arg(offset);
         return CompileResult::Ok;
     }

@@ -16,8 +16,3 @@ StringObj::StringObj(std::string v) {
     value = (char*)malloc(v.length());
     memcpy(value, v.c_str(), v.length());
 }
-
-
-Value StringObj::toString() {
-    return Value(this);
-}

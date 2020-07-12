@@ -240,10 +240,13 @@ Vec<Token> brim::scan(const char *source) {
         // Strings
         if (token == nullptr) {
             std::cmatch results;
-            std::regex_search((char*)c, results, std::regex("^'([^']*)'|\"([^\"]*)\""));
+            std::regex_search((char*)c, results, std::regex("^(?:'([^']*)'|\"([^\"]*)\")"));
             if (!results.empty()) {
                 i += results.length();
                 auto match = results[1].str();
+                if (match == "") {
+                    match = results[2].str();
+                }
                 TokenData data;
                 data.text = &match;
                 token = new Token(TokenType::String, data);

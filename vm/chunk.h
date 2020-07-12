@@ -39,8 +39,9 @@ namespace brim {
 
         usize get_program_length() const;
 
-        usize write_string(const char *string, usize length);
-        const char *read_string(usize offset, usize length) const;
+        usize write_string(const char *string);
+        usize write_string(const std::string &string);
+        const char *read_string(usize offset) const;
 
         void debug();
     };

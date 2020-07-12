@@ -3,7 +3,6 @@
 #include <string>
 
 #include "../common.h"
-#include "../value.h"
 #include "object.h"
 
 namespace brim {
@@ -17,8 +16,6 @@ namespace brim {
     public:
         StringObj(const char* v);
         StringObj(std::string v);
-
-        Value toString();
 
     };
 

@@ -1,10 +1,12 @@
 
 #include <cstring>
+#include <string>
 #include "common.h"
 #include "chunk.h"
 #include "opcode.h"
 
 using namespace brim;
+using namespace std;
 
 usize Chunk::push_opcode(OpCode opcode) {
     program.push((u8)opcode);
@@ -22,18 +24,32 @@ usize Chunk::get_program_length() const {
     return program.get_length();
 }
 
-usize Chunk::write_string(const char *string, usize length) {
-    values.ensure_capacity(values.get_length()+length);
+usize Chunk::write_string(const char *string) {
+    values.ensure_capacity(values.get_length()+strlen(string)+1);
     auto offset = values.get_length();
-    char* last = (char*)(&values.last()) + sizeof(char);
+    char* last = (char*)&values[offset];
     strcpy(last, string);
+    values.set_length(values.get_length()+strlen(string)+1);
     return offset;
 }
-const char *Chunk::read_string(usize offset, usize length) const {
-    return (char*)(values.get_pointer() + (offset * sizeof(u8)));
+usize Chunk::write_string(const string& string) {
+    return write_string(string.c_str());
+}
+const char *Chunk::read_string(usize offset) const {
+    return (const char*)&values[offset];
 }
 
 void Chunk::debug() {
+    {
+        char *strings = (char *)malloc(values.get_length());
+        memcpy(strings, &values[0], values.get_length());
+        for (usize i = 0; i < values.get_length(); i++) {
+            if (strings[i] == 0) {
+                strings[i] = 32; 
+            }
+        }
+        printf("Strings: %s\n", strings);
+    }
     printf("Program: \n");
     for (usize i = 0; i < program.get_length(); i++) {
         OpCode op = (OpCode)program[i];
@@ -41,6 +57,12 @@ void Chunk::debug() {
             f64 n = *get_arg<f64>(i+1);
             printf(" | Number(%lf)\n", n);
             i += sizeof(f64);
+        }
+        else if (OpCode::String == op) {
+            usize offset = *get_arg<usize>(i+1);
+            const char *string = read_string(offset);
+            printf(" | String(%s)\n", string);
+            i += sizeof(usize);
         }
         else if (OpCode::Add == op) {
             printf(" | Add\n");
