@@ -13,7 +13,7 @@ struct State {
     string *error_message = nullptr;
 
     const Vec<Token> &tokens;
-    usize current_offset;
+    usize current_offset = 0;
 
     Chunk *chunk;
 
