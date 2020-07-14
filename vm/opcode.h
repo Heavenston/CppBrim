@@ -25,6 +25,8 @@ namespace brim {
         Null,
         True,
         False,
+
+        Pop,
     };
 
 }

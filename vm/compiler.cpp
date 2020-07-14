@@ -25,7 +25,7 @@ struct State {
         return &tokens[current_offset];
     }
     const Token *next() {
-        if (current_offset+1 >= tokens.get_length()) return nullptr;
+        if (current_offset >= tokens.get_length()) return nullptr;
         return &tokens[current_offset++];
     }
 };
@@ -36,27 +36,38 @@ enum class CompileResult: u8 {
     InvalidSyntax,
 };
 
-#define compile_try(result) if (result != CompileResult::Ok) {\
+#define compile_expect_invalid(result) propagate_error(result); if (result != CompileResult::Ok) {\
     return CompileResult::Invalid;\
 }
 #define compile_expect(result) if (result != CompileResult::Ok) {\
     return CompileResult::InvalidSyntax;\
 }
+// #define propagate_error(result) if (result == CompileResult::InvalidSyntax) {\
+//     return CompileResult::InvalidSyntax;\
+// }
+#define propagate_error(result)
 
-#define compile_consume(token, error) if (state.next()->type != token) {\
-    state.error_message = new string(error);\
-    return CompileResult::InvalidSyntax;\
+#define compile_consume(token, error) {\
+    auto next = state.next();\
+    if (next == nullptr || next->type != token) {\
+        state.error_message = new string(error);\
+        return CompileResult::InvalidSyntax;\
+    }\
 }
 
 CompileResult compile_expression(State &state);
 CompileResult compile_value(State &state);
+CompileResult compile_statement(State &state);
 
 Chunk *brim::compile(const Vec<Token> &tokens) {
     State state(nullptr, tokens, new Chunk());
 
-    CompileResult rs = compile_expression(state);
-    if (rs != CompileResult::Ok) {
-        printf("ERROR: %s\n", state.error_message->c_str());
+    CompileResult r = CompileResult::Ok;
+    while ((r = compile_statement(state)) == CompileResult::Ok) {}
+
+    if (r == CompileResult::InvalidSyntax) {
+        printf("Invalid Syntax: %s\n", state.error_message->c_str());
+        throw;
     }
 
     return state.chunk;
@@ -89,8 +100,28 @@ u8 *get_operator_precedence(const TokenType &token) {
     }
 }
 
+CompileResult compile_statement(State &state) {
+    // Expression statement
+    {
+        auto rs = compile_expression(state);
+        propagate_error(rs);
+        if (rs == CompileResult::Ok) {
+            compile_consume(TokenType::SemiColon, "Expected ';' after expression");
+            state.chunk->push_opcode(OpCode::Pop);
+            return CompileResult::Ok;
+        }
+    }
+
+    return CompileResult::Invalid;
+}
+
 CompileResult compile_expression_x(State &state, u8 precedence) {
     if (precedence >= 3) precedence = 3;
+
+    if (state.current() == nullptr) {
+        state.error_message = new string("Expression expected found end of input");
+        return CompileResult::Invalid;
+    }
 
     switch (state.current()->type) {
         case TokenType::BracketOpen:
@@ -106,7 +137,7 @@ CompileResult compile_expression_x(State &state, u8 precedence) {
         break;
         default:
             if (precedence == 0) {
-                compile_try(compile_value(state));
+                compile_expect_invalid(compile_value(state));
                 return CompileResult::Ok;
             }
             compile_expect(compile_expression_x(state, precedence-1));
@@ -129,11 +160,17 @@ CompileResult compile_expression_x(State &state, u8 precedence) {
 }
 
 CompileResult compile_expression(State &state) {
-    compile_expect(compile_expression_x(state, 255));
+    compile_expect_invalid(compile_expression_x(state, 255));
     return CompileResult::Ok;
 }
 
 CompileResult compile_value(State &state) {
+
+    if (state.current() == nullptr) {
+        state.error_message = new string("Value expected found end of input");
+        return CompileResult::Invalid;
+    }
+
     const Token *current = state.current();
     if (current == nullptr) {
         state.error_message = new string("Invalid Value");
