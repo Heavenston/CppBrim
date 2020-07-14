@@ -76,8 +76,11 @@ void Chunk::debug() {
         else if (OpCode::Sub == op) {
             printf(" | Sub\n");
         }
+        else if (OpCode::Pop == op) {
+            printf(" | Pop\n");
+        }
         else {
-            printf(" | %x\n", program[i]);
+            printf(" | x%x\n", program[i]);
         }
     }
     printf("\n");
