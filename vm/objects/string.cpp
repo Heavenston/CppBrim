@@ -16,3 +16,7 @@ StringObj::StringObj(std::string v) {
     value = (char*)malloc(v.length());
     memcpy(value, v.c_str(), v.length());
 }
+
+const char* StringObj::to_string() {
+    return value;
+}

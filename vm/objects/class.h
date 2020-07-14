@@ -14,8 +14,14 @@ namespace brim {
         ObjectType type = ObjectType::Class;
         std::unordered_map<std::string, Value> methods;
 
+        const char* name = ""; 
+
     public:
-        
+        ClassObj();
+        ClassObj(const char* a_name);
+        const char *get_name();
+
+        const char *to_string();
     };
 
 }

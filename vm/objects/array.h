@@ -14,6 +14,8 @@ namespace brim {
     public:
         ArrayObj(Vec<Value> v);
 
+        const char *to_string();
+
     };
 
 }

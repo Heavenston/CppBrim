@@ -8,3 +8,7 @@ using namespace brim;
 ArrayObj::ArrayObj(Vec<Value> v) {
     vec = v;
 }
+
+const char *ArrayObj::to_string() {
+    return "[Array]";
+}

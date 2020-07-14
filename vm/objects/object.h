@@ -16,7 +16,7 @@ namespace brim {
         ObjectType type;
 
     public:
-        const char *toString() {
+        const char *to_string() {
             return "[Object]";
         }
 

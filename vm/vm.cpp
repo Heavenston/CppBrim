@@ -89,6 +89,10 @@ void VM::run() {
             stack.push(Value(powf(a.number_val(), b.number_val())));
         }
 
+        else if (v == OpCode::Pop) {
+            stack.pop();
+        }
+
         ip++;
     }
 

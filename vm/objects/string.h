@@ -17,6 +17,7 @@ namespace brim {
         StringObj(const char* v);
         StringObj(std::string v);
 
+        const char *to_string();
     };
 
 }

@@ -9,6 +9,7 @@ namespace brim {
         Number,
         Boolean,
         Null,
+        Object,
     };
 
     class Value {
@@ -30,6 +31,8 @@ namespace brim {
 
         f64 number_val();
         bool boolean_val();
+
+        const char* to_string();
     };
 
 }

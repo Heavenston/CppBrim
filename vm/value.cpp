@@ -1,4 +1,6 @@
 
+#include <string>
+
 #include "common.h"
 #include "value.h"
 
@@ -29,4 +31,26 @@ f64 Value::number_val() {
 }
 bool Value::boolean_val() {
     return payload.boolean;
+}
+
+const char* Value::to_string() {
+    switch (type) {
+        case ValueType::Object:
+            return payload.object->to_string();
+        break;
+        case ValueType::Boolean:
+            if (payload.boolean) {
+                return "true";
+            }
+            else {
+                return "false";
+            }
+        break;
+        case ValueType::Null:
+            return "null";
+        break;
+        case ValueType::Number:
+            return std::to_string(payload.number).c_str();
+        break;
+    }
 }
