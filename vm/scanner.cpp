@@ -24,6 +24,18 @@ Vec<Token> brim::scan(const char *source) {
         Token *token = nullptr;
 
         switch (*c) {
+            case ' ':
+                i++;
+                continue;
+            break;
+            case '\n':
+                i++;
+                continue;
+            break;
+            case '\t':
+                i++;
+                continue;
+            break;
             case '=':
                 i++;
                 if (source[i] == '=') {
