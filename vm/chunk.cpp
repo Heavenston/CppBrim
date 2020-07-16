@@ -97,7 +97,7 @@ void Chunk::debug() {
             i += sizeof(usize);
         }
         else {
-            printf(" | x%x\n", program[i]);
+            printf(" | %d\n", program[i]);
         }
     }
     printf("\n");
