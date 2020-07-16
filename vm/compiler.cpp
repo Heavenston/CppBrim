@@ -1,6 +1,7 @@
 
 #include <string>
 #include <array>
+#include <map>
 #include "compiler.h"
 #include "chunk.h"
 #include "vec.h"
@@ -23,9 +24,17 @@ struct State {
     Chunk *chunk;
 
     bool stack_has_value = false;
+    Vec<map<string, u16>*> scopes;
 
     State(string *er_mess, const Vec<Token> &tkns, Chunk *chnk):
-     tokens(tkns), error_message(er_mess), chunk(chnk) {}
+     tokens(tkns), error_message(er_mess), chunk(chnk) {
+        create_scope();
+    }
+    ~State() {
+        for (usize i = 0; i < scopes.get_length(); i++) {
+            delete scopes[i];
+        }
+    }
 
     const Token *current() const {
         if (current_offset >= tokens.get_length()) return nullptr;
@@ -39,12 +48,27 @@ struct State {
         if (current_offset >= tokens.get_length()) return nullptr;
         return &tokens[current_offset++];
     }
+
+    const map<string, u16> *current_scope() {
+        return scopes.last();
+    }
+    const map<string, u16> *create_scope() {
+        scopes.push(new map<string, u16>());
+        return scopes.last();
+    }
 };
 
 enum class CompileResult: u8 {
     Ok,
     Invalid,
     InvalidSyntax,
+};
+
+struct BlockCompileResult {
+    CompileResult compile_result;
+    bool return_value;
+
+    BlockCompileResult(CompileResult cr, bool rv = false): compile_result(cr), return_value(rv) {}
 };
 
 #define compile_expect_invalid(result) propagate_error(result); if (result != CompileResult::Ok) {\
@@ -69,6 +93,8 @@ enum class CompileResult: u8 {
 CompileResult compile_expression(State &state);
 CompileResult compile_value(State &state);
 CompileResult compile_statement(State &state);
+CompileResult compile_declaration(State &state);
+BlockCompileResult compile_block(State &state);
 
 Chunk *brim::compile(const Vec<Token> &tokens) {
     State state(nullptr, tokens, new Chunk());
@@ -112,9 +138,51 @@ u8 *get_operator_precedence(const TokenType &token) {
 }
 
 CompileResult compile_statement(State &state) {
-    
+
     if (state.current() == nullptr) {
         state.error_message = new string("Statement expected found end of input");
+        return CompileResult::Invalid;
+    }
+
+    // Declaration Statement
+    {
+        CompileResult r = compile_declaration(state);
+        propagate_error(r);
+        if (r == CompileResult::Ok) {
+            compile_consume(TokenType::SemiColon, "';' expected after expression");
+            return CompileResult::Ok;
+        }
+    }
+
+    // Block Statement
+    {
+        BlockCompileResult r = compile_block(state);
+        propagate_error(r.compile_result);
+        if (r.compile_result == CompileResult::Ok) {
+            if (r.return_value) {
+                state.chunk->push_opcode(OpCode::Pop);
+            }
+            return CompileResult::Ok;
+        }
+    }
+
+    // Expression Statement
+    {
+        CompileResult r = compile_expression(state);
+        propagate_error(r);
+        if (r == CompileResult::Ok) {
+            compile_consume(TokenType::SemiColon, "';' expected after declaration");
+            return CompileResult::Ok;
+        }
+    }
+
+    return CompileResult::Invalid;
+}
+
+CompileResult compile_declaration(State &state) {
+    
+    if (state.current() == nullptr) {
+        state.error_message = new string("Declaration expected found end of input");
         return CompileResult::Invalid;
     }
 
@@ -124,7 +192,7 @@ CompileResult compile_statement(State &state) {
             state.next();
             auto name = state.current();
             compile_consume(TokenType::Symbol, "Expected symbol after 'let'");
-            auto offset = state.chunk->write_string(*name->data.text);
+            auto offset = state.chunk->write_string(name->data.text);
             if (token_is(state.current(), TokenType::Equal)) {
                 compile_consume(TokenType::Equal, "");
                 compile_expression(state);
@@ -132,22 +200,48 @@ CompileResult compile_statement(State &state) {
             else {
                 state.chunk->push_opcode(OpCode::Null);
             }
-            compile_consume(TokenType::SemiColon, "Expected ';' after declaration");
             state.chunk->push_opcode(OpCode::GlobalDeclaration);
             state.chunk->push_arg(offset);
         }
     }
 
-    // Expression statement
-    {
-        auto rs = compile_expression(state);
-        propagate_error(rs);
-        if (rs == CompileResult::Ok) {
-            compile_consume(TokenType::SemiColon, "Expected ';' after expression");
-            state.chunk->push_opcode(OpCode::Pop);
-            state.stack_has_value = false;
-            return CompileResult::Ok;
+    return CompileResult::Invalid;
+}
+
+BlockCompileResult compile_block(State &state) {
+    if (token_is(state.current(), TokenType::CurlyOpen)) {
+        state.next();
+        state.create_scope();
+        bool return_value = false;
+        
+        for (;;) {
+            if (token_is(state.current(), TokenType::CurlyClose)) {
+                break;
+            }
+
+            CompileResult r = compile_declaration(state);
+            propagate_error(r);
+            if (r == CompileResult::Ok) {
+                compile_consume(TokenType::SemiColon, "';' expected after declaration");
+                continue;
+            }
+
+            r = compile_expression(state);
+            compile_expect(r);
+
+            if (token_is(state.current(), TokenType::SemiColon)) {
+                state.next();
+                state.chunk->push_opcode(OpCode::Pop);
+            }
+            else {
+                return_value = true;
+                break;
+            }
+
         }
+
+        compile_consume(TokenType::CurlyClose, "'}' expected to close block");
+        return BlockCompileResult(CompileResult::Ok, return_value);
     }
 
     return CompileResult::Invalid;
@@ -204,13 +298,25 @@ CompileResult compile_expression(State &state) {
         state.next();
         auto name = state.current();
         compile_consume(TokenType::Symbol, "");
-        auto offset = state.chunk->write_string(*name->data.text);
+        auto offset = state.chunk->write_string(name->data.text);
         compile_consume(TokenType::Equal, "");
         compile_expression(state);
         compile_consume(TokenType::SemiColon, "Expected ';' after assignement");
         state.chunk->push_opcode(OpCode::GlobalAssignement);
         state.chunk->push_arg(offset);
         return CompileResult::Ok;
+    }
+
+    // Block Expression
+    {
+        BlockCompileResult r = compile_block(state);
+        propagate_error(r.compile_result);
+        if (r.compile_result == CompileResult::Ok) {
+            if (!r.return_value) {
+                state.chunk->push_opcode(OpCode::Null);
+            }
+            return CompileResult::Ok;
+        }
     }
 
     compile_expect_invalid(compile_expression_x(state, 255));
@@ -250,7 +356,7 @@ CompileResult compile_value(State &state) {
     else if (current->type == TokenType::String) {
         state.next();
         state.chunk->push_opcode(OpCode::String);
-        usize offset = state.chunk->write_string(current->data.text->c_str());
+        usize offset = state.chunk->write_string(current->data.text);
         state.chunk->push_arg(offset);
         return CompileResult::Ok;
     }

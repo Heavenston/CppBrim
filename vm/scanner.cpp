@@ -244,7 +244,9 @@ Vec<Token> brim::scan(const char *source) {
                 i += results.length();
                 auto match = results[1].str();
                 TokenData data;
-                data.text = &match;
+                char *str = (char *)malloc(match.length());
+                strcpy(str, match.c_str());
+                data.text = str;
                 token = new Token(TokenType::MultiLineComment, data);
             }
         }
@@ -256,7 +258,9 @@ Vec<Token> brim::scan(const char *source) {
                 i += results.length();
                 auto match = results[1].str();
                 TokenData data;
-                data.text = &match;
+                char *str = (char *)malloc(match.length());
+                strcpy(str, match.c_str());
+                data.text = str;
                 token = new Token(TokenType::InlineComment, data);
             }
         }
@@ -271,7 +275,9 @@ Vec<Token> brim::scan(const char *source) {
                     match = results[2].str();
                 }
                 TokenData data;
-                data.text = &match;
+                char *str = (char *)malloc(match.length());
+                strcpy(str, match.c_str());
+                data.text = str;
                 token = new Token(TokenType::String, data);
             }
         }
@@ -324,7 +330,9 @@ Vec<Token> brim::scan(const char *source) {
                 i += results.length();
                 auto match = results[0].str();
                 TokenData data;
-                data.text = &match;
+                char *str = (char *)malloc(match.length());
+                strcpy(str, match.c_str());
+                data.text = str;
                 token = new Token(TokenType::Symbol, data);
             }
         }

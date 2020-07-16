@@ -75,7 +75,7 @@ namespace brim {
 
     union TokenData {
         f64 number = 0;
-        std::string *text;
+        const char *text;
 
         ~TokenData() {};
     };
