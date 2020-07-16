@@ -92,6 +92,10 @@ void VM::run() {
         else if (v == OpCode::Pop) {
             stack.pop();
         }
+        else if (v == OpCode::Peek) {
+            usize i = *chunk->get_arg<usize>(ip+1);
+            stack.push(stack.peek(i));
+        }
 
         ip++;
     }

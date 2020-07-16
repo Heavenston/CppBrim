@@ -91,6 +91,11 @@ void Chunk::debug() {
         else if (OpCode::Pop == op) {
             printf(" | Pop\n");
         }
+        else if (OpCode::Peek == op) {
+            usize n = *get_arg<usize>(i+1);
+            printf(" | Peek(%lu)\n", n);
+            i += sizeof(usize);
+        }
         else {
             printf(" | x%x\n", program[i]);
         }

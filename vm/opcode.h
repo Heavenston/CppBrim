@@ -30,6 +30,7 @@ namespace brim {
         GlobalAssignement,
 
         Pop,
+        Peek,
     };
 
 }
