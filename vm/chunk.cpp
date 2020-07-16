@@ -64,6 +64,9 @@ void Chunk::debug() {
             printf(" | String(%s)\n", string);
             i += sizeof(usize);
         }
+        else if (OpCode::Null == op) {
+            printf(" | Null\n");
+        }
         else if (OpCode::GlobalDeclaration == op) {
             usize offset = *get_arg<usize>(i+1);
             const char *string = read_string(offset);
