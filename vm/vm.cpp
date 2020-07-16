@@ -96,5 +96,14 @@ void VM::run() {
         ip++;
     }
 
-    cout << "Top of stack: " << stack[0].number_val() << "\n";
+    if (stack.get_length() <= 0) {
+        cout << "Stack empty\n";
+    }
+    else {
+        cout << "Stack: \n";
+        for (usize i = 0; i < stack.get_length(); i++) {
+            cout << " > " << stack[i].to_string() << "\n";
+        }
+    }
+    
 }

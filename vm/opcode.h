@@ -26,6 +26,9 @@ namespace brim {
         True,
         False,
 
+        GlobalDeclaration,
+        GlobalAssignement,
+
         Pop,
     };
 

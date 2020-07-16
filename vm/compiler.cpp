@@ -9,6 +9,11 @@
 using namespace brim;
 using namespace std;
 
+bool token_is(const Token *token, TokenType type) {
+    if (token == nullptr) return false;
+    return token->type == type;
+}
+
 struct State {
     string *error_message = nullptr;
 
@@ -17,12 +22,18 @@ struct State {
 
     Chunk *chunk;
 
+    bool stack_has_value = false;
+
     State(string *er_mess, const Vec<Token> &tkns, Chunk *chnk):
      tokens(tkns), error_message(er_mess), chunk(chnk) {}
 
     const Token *current() const {
         if (current_offset >= tokens.get_length()) return nullptr;
         return &tokens[current_offset];
+    }
+    const Token *peek(usize i) const {
+        if (current_offset+i >= tokens.get_length()) return nullptr;
+        return &tokens[current_offset+i];
     }
     const Token *next() {
         if (current_offset >= tokens.get_length()) return nullptr;
@@ -101,6 +112,32 @@ u8 *get_operator_precedence(const TokenType &token) {
 }
 
 CompileResult compile_statement(State &state) {
+    
+    if (state.current() == nullptr) {
+        state.error_message = new string("Statement expected found end of input");
+        return CompileResult::Invalid;
+    }
+
+    // Declaration
+    {
+        if (token_is(state.current(), TokenType::Let)) {
+            state.next();
+            auto name = state.current();
+            compile_consume(TokenType::Symbol, "Expected symbol after 'let'");
+            auto offset = state.chunk->write_string(*name->data.text);
+            if (token_is(state.current(), TokenType::Equal)) {
+                compile_consume(TokenType::Equal, "");
+                compile_expression(state);
+            }
+            else {
+                state.chunk->push_opcode(OpCode::Null);
+            }
+            compile_consume(TokenType::SemiColon, "Expected ';' after declaration");
+            state.chunk->push_opcode(OpCode::GlobalDeclaration);
+            state.chunk->push_arg(offset);
+        }
+    }
+
     // Expression statement
     {
         auto rs = compile_expression(state);
@@ -108,6 +145,7 @@ CompileResult compile_statement(State &state) {
         if (rs == CompileResult::Ok) {
             compile_consume(TokenType::SemiColon, "Expected ';' after expression");
             state.chunk->push_opcode(OpCode::Pop);
+            state.stack_has_value = false;
             return CompileResult::Ok;
         }
     }
@@ -160,6 +198,21 @@ CompileResult compile_expression_x(State &state, u8 precedence) {
 }
 
 CompileResult compile_expression(State &state) {
+
+    // Assignement
+    if (token_is(state.current(), TokenType::Symbol) && token_is(state.peek(1), TokenType::Equal)) {
+        state.next();
+        auto name = state.current();
+        compile_consume(TokenType::Symbol, "");
+        auto offset = state.chunk->write_string(*name->data.text);
+        compile_consume(TokenType::Equal, "");
+        compile_expression(state);
+        compile_consume(TokenType::SemiColon, "Expected ';' after assignement");
+        state.chunk->push_opcode(OpCode::GlobalAssignement);
+        state.chunk->push_arg(offset);
+        return CompileResult::Ok;
+    }
+
     compile_expect_invalid(compile_expression_x(state, 255));
     return CompileResult::Ok;
 }
@@ -172,6 +225,7 @@ CompileResult compile_value(State &state) {
     }
 
     const Token *current = state.current();
+    state.stack_has_value = true;
     if (current == nullptr) {
         state.error_message = new string("Invalid Value");
         return CompileResult::Invalid;
@@ -205,6 +259,7 @@ CompileResult compile_value(State &state) {
         return CompileResult::Ok;
     }
 
+    state.stack_has_value = false;
     state.error_message = new string("Invalid Value");
     return CompileResult::Invalid;
 }

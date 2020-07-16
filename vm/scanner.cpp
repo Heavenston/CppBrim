@@ -9,6 +9,17 @@
 
 using namespace brim;
 
+bool str_eq(const char* first, const char* sec) {
+    usize i = 0;
+    bool eq = true;
+    for (;;) {
+        if (first[i] == 0 || sec[i] == 0) break;
+        eq = eq && first[i] == sec[i];
+        i++;
+    }
+    return eq;
+}
+
 Token::Token(TokenType _type, TokenData _data) {
     type = _type;
     data = _data;
@@ -183,43 +194,43 @@ Vec<Token> brim::scan(const char *source) {
         }
 
         if (token == nullptr) {
-            if (strcmp((char*)c, "let") == 0) {
+            if (str_eq((char*)c, "let")) {
                 i += 3;
                 token = new Token(TokenType::Let);
             }
-            else if (strcmp((char*)c, "const") == 0) {
+            else if (str_eq((char*)c, "const")) {
                 i += 4;
                 token = new Token(TokenType::Const);
             }
-            else if (strcmp((char*)c, "return") == 0) {
+            else if (str_eq((char*)c, "return")) {
                 i += 6;
                 token = new Token(TokenType::Return);
             }
-            else if (strcmp((char*)c, "true") == 0) {
+            else if (str_eq((char*)c, "true")) {
                 i += 4;
                 token = new Token(TokenType::True);
             }
-            else if (strcmp((char*)c, "false") == 0) {
+            else if (str_eq((char*)c, "false")) {
                 i += 5;
                 token = new Token(TokenType::False);
             }
-            else if (strcmp((char*)c, "null") == 0) {
+            else if (str_eq((char*)c, "null")) {
                 i += 4;
                 token = new Token(TokenType::Null);
             }
-            else if (strcmp((char*)c, "if") == 0) {
+            else if (str_eq((char*)c, "if")) {
                 i += 2;
                 token = new Token(TokenType::If);
             }
-            else if (strcmp((char*)c, "else") == 0) {
+            else if (str_eq((char*)c, "else")) {
                 i += 4;
                 token = new Token(TokenType::Else);
             }
-            else if (strcmp((char*)c, "while") == 0) {
+            else if (str_eq((char*)c, "while")) {
                 i += 5;
                 token = new Token(TokenType::While);
             }
-            else if (strcmp((char*)c, "func") == 0) {
+            else if (str_eq((char*)c, "func")) {
                 i += 4;
                 token = new Token(TokenType::Function);
             }
@@ -305,8 +316,21 @@ Vec<Token> brim::scan(const char *source) {
             }
         }
 
+        // Symbols
+        if (token == nullptr) {
+            std::cmatch results;
+            std::regex_search((char*)c, results, std::regex("^[A-Za-z_][A-Za-z0-9_]*"));
+            if (!results.empty()) {
+                i += results.length();
+                auto match = results[0].str();
+                TokenData data;
+                data.text = &match;
+                token = new Token(TokenType::Symbol, data);
+            }
+        }
 
         if (token == nullptr) {
+            i++;
             vec.push(Token(TokenType::Error));
         }
         else {
