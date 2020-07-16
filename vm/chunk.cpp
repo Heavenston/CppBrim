@@ -43,7 +43,7 @@ void Chunk::debug() {
     {
         char *strings = (char *)malloc(values.get_length());
         memcpy(strings, &values[0], values.get_length());
-        for (usize i = 0; i < values.get_length(); i++) {
+        for (usize i = 0; i < values.get_length()-1; i++) {
             if (strings[i] == 0) {
                 strings[i] = 32; 
             }
@@ -61,7 +61,7 @@ void Chunk::debug() {
         else if (OpCode::String == op) {
             usize offset = *get_arg<usize>(i+1);
             const char *string = read_string(offset);
-            printf(" | String(%s)\n", string);
+            printf(" | String(%lu) [%s]\n", offset, string);
             i += sizeof(usize);
         }
         else if (OpCode::Null == op) {
@@ -70,13 +70,13 @@ void Chunk::debug() {
         else if (OpCode::GlobalDeclaration == op) {
             usize offset = *get_arg<usize>(i+1);
             const char *string = read_string(offset);
-            printf(" | GlobalDecl(%s)\n", string);
+            printf(" | GlobalDecl(%lu) [%s]\n", offset, string);
             i += sizeof(usize);
         }
         else if (OpCode::GlobalAssignement == op) {
             usize offset = *get_arg<usize>(i+1);
             const char *string = read_string(offset);
-            printf(" | GlobalAssi(%s)\n", string);
+            printf(" | GlobalAssi(%lu) [%s]\n", offset, string);
             i += sizeof(usize);
         }
         else if (OpCode::Add == op) {
