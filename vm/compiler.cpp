@@ -226,10 +226,6 @@ CompileResult compile_value(State &state) {
 
     const Token *current = state.current();
     state.stack_has_value = true;
-    if (current == nullptr) {
-        state.error_message = new string("Invalid Value");
-        return CompileResult::Invalid;
-    };
     if (current->type == TokenType::Number) {
         state.next();
         state.chunk->push_opcode(OpCode::Number);
