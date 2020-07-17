@@ -71,16 +71,15 @@ struct BlockCompileResult {
     BlockCompileResult(CompileResult cr, bool rv = false): compile_result(cr), return_value(rv) {}
 };
 
-#define compile_expect_invalid(result) propagate_error(result); if (result != CompileResult::Ok) {\
-    return CompileResult::Invalid;\
+#define compile_expect_invalid(result) if (result != CompileResult::Ok) {\
+    return result;\
 }
 #define compile_expect(result) if (result != CompileResult::Ok) {\
     return CompileResult::InvalidSyntax;\
 }
-// #define propagate_error(result) if (result == CompileResult::InvalidSyntax) {\
-//     return CompileResult::InvalidSyntax;\
-// }
-#define propagate_error(result)
+#define propagate_error(result) if (result == CompileResult::InvalidSyntax) {\
+    return CompileResult::InvalidSyntax;\
+}
 
 #define compile_consume(token, error) {\
     auto next = state.next();\
@@ -176,6 +175,7 @@ CompileResult compile_statement(State &state) {
         }
     }
 
+    state.error_message = new string("Invalid statement");
     return CompileResult::Invalid;
 }
 
@@ -195,7 +195,7 @@ CompileResult compile_declaration(State &state) {
             auto offset = state.chunk->write_string(name->data.text);
             if (token_is(state.current(), TokenType::Equal)) {
                 compile_consume(TokenType::Equal, "");
-                compile_expression(state);
+                compile_expect(compile_expression(state));
             }
             else {
                 state.chunk->push_opcode(OpCode::Null);
@@ -220,14 +220,21 @@ BlockCompileResult compile_block(State &state) {
             }
 
             CompileResult r = compile_declaration(state);
-            propagate_error(r);
+            if (r == CompileResult::InvalidSyntax) {
+                return BlockCompileResult(CompileResult::InvalidSyntax);
+            }
             if (r == CompileResult::Ok) {
-                compile_consume(TokenType::SemiColon, "';' expected after declaration");
+                if (!token_is(state.next(), TokenType::SemiColon)) {
+                    state.error_message = new string("';' expected after declaration");
+                    return CompileResult::InvalidSyntax;
+                }
                 continue;
             }
 
             r = compile_expression(state);
-            compile_expect(r);
+            if (r != CompileResult::Ok) {
+                return BlockCompileResult(CompileResult::InvalidSyntax);
+            }
 
             if (token_is(state.current(), TokenType::SemiColon)) {
                 state.next();
@@ -244,6 +251,7 @@ BlockCompileResult compile_block(State &state) {
         return BlockCompileResult(CompileResult::Ok, return_value);
     }
 
+    state.error_message = new string("Invalid block");
     return CompileResult::Invalid;
 }
 
@@ -269,8 +277,7 @@ CompileResult compile_expression_x(State &state, u8 precedence) {
         break;
         default:
             if (precedence == 0) {
-                compile_expect_invalid(compile_value(state));
-                return CompileResult::Ok;
+                return compile_value(state);
             }
             compile_expect(compile_expression_x(state, precedence-1));
         break;
@@ -300,7 +307,7 @@ CompileResult compile_expression(State &state) {
         compile_consume(TokenType::Symbol, "");
         auto offset = state.chunk->write_string(name->data.text);
         compile_consume(TokenType::Equal, "");
-        compile_expression(state);
+        compile_expect(compile_expression(state));
         compile_consume(TokenType::SemiColon, "Expected ';' after assignement");
         state.chunk->push_opcode(OpCode::GlobalAssignement);
         state.chunk->push_arg(offset);
@@ -319,8 +326,7 @@ CompileResult compile_expression(State &state) {
         }
     }
 
-    compile_expect_invalid(compile_expression_x(state, 255));
-    return CompileResult::Ok;
+    return compile_expression_x(state, 255);
 }
 
 CompileResult compile_value(State &state) {
